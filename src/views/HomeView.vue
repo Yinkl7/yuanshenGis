@@ -1,34 +1,14 @@
 <script setup lang="ts">
-import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import { onMounted } from 'vue'
+import { MapManager } from '@/js/map-manage'
 
 onMounted(() => {
   init()
 })
 
 function init() {
-  const bounds = L.latLngBounds(L.latLng(0, 0), L.latLng(-256, 256))
-  let map = L.map('map', {
-    maxBounds: bounds,
-    center: [-84, 149],
-    crs: L.CRS.Simple,
-    zoomControl: false,
-    attributionControl: false,
-    zoom: 5,
-    minZoom: 4,
-    maxZoom: 7
-  })
-
-  map.on('click', (workingLayer) => {
-    const cordinate = workingLayer.latlng
-    console.log(cordinate)
-  })
-
-  L.tileLayer('images/map/{z}/{x}/{y}.png', {
-    bounds,
-    maxZoom: 7
-  }).addTo(map)
+  const mapManager = new MapManager('map')
 
   const markerList = [
     {
@@ -43,18 +23,7 @@ function init() {
     }
   ]
 
-  let markers = markerList.map((item) => {
-    return L.marker(L.latLng(item.lat, item.lng), {
-      icon: L.divIcon({
-        className: 'map-marker-item',
-        html: `<div class='area-mark-item'>${item.areaName}</div>`
-      })
-    })
-  })
-
-  let areaNameLayer = L.layerGroup(markers)
-  areaNameLayer.addTo(map)
-  console.log('init map= ', map)
+  mapManager.renderAreaNames(markerList)
 
   const pointerList = [
     {
@@ -69,21 +38,9 @@ function init() {
     }
   ]
 
-  let pointerMarks = pointerList.map((item) => {
-    let { lat, lng, iconId } = item
-    const iconUrl = `images/map-icon/${iconId}.png`
-    return L.marker(L.latLng(lat, lng), {
-      icon: L.divIcon({
-        className: 'map-point-item',
-        html: `<div class='point-item-container'>
-          <div class='point-pic' style="background-image: url(${iconUrl})"></div>
-        </div>`
-      })
-    })
-  })
+  mapManager.renderPoints(pointerList)
 
-  let pointLayer = L.layerGroup(pointerMarks)
-  pointLayer.addTo(map)
+  mapManager.enableDebugger()
 }
 </script>
 
