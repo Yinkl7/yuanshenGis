@@ -1,4 +1,37 @@
 @import './base.less';
 
+* {
+  box-sizing: border-box;
+}
+
 #app {
+}
+
+.map-marker-item {
+  .area-mark-item {
+    background: none;
+    border: none;
+    white-space: nowrap;
+    font-size: 18px;
+    font-weight: 400;
+    color: #fff;
+    text-shadow: 0 0 3px #333;
+    line-height: 1;
+    opacity: 0.8;
+  }
+}
+
+.point-item-container {
+  width: 36px;
+  height: 40px;
+  background-image: url('../assets/images/map/icon-bg.png');
+  background-size: cover;
+  display: flex;
+  justify-content: center;
+  padding-top: 4px;
+  .point-pic {
+    width: 25px;
+    height: 25px;
+    background-size: cover;
+  }
 }
