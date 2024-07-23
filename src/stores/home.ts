@@ -6,6 +6,8 @@ export const useHomeStore = defineStore('home', () => {
 
   const selectTreeList = ref<any[]>([])
 
+  const mapAnchorList = ref<any[]>([])
+
   function setFilterTree(data: any) {
     filterTree.value = data
   }
@@ -19,5 +21,10 @@ export const useHomeStore = defineStore('home', () => {
     Reflect.set(data, 'active', !data.active)
   }
 
-  return { filterTree, selectTreeList, setFilterTree, handleSelectTreeList }
+  function setMapAnchorList(data: any) {
+    console.log('mapAnchorList======= ', data)
+    mapAnchorList.value = data
+  }
+
+  return { filterTree, selectTreeList, mapAnchorList, setFilterTree, handleSelectTreeList, setMapAnchorList }
 })

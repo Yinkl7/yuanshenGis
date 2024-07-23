@@ -6,28 +6,38 @@ import FilterHeader from '@/components/FilterHeader.vue'
 import LocationBtn from '@/components/LocationBtn.vue'
 import SelectArea from '@/components/SelectArea.vue'
 import FilterMain from '@/components/FilterMain.vue'
+import { useHomeStore } from '@/stores/home'
+import { getMapAnchorList } from '@/js/api'
+
+const store = useHomeStore()
 
 onMounted(() => {
   init()
 })
 
-function init() {
+async function initMapAnchorList() {
+  let res = await getMapAnchorList()
+  store.setMapAnchorList(res.data)
+}
+
+async function init() {
+  await initMapAnchorList()
   const mapManager = new MapManager('map')
 
-  const markerList = [
-    {
-      lat: -88.28,
-      lng: 139.41,
-      areaName: '苍风高地'
-    },
-    {
-      lat: -100.96,
-      lng: 127.12,
-      areaName: '碧水原'
-    }
-  ]
-
-  mapManager.renderAreaNames(markerList)
+  // const markerList = [
+  //   {
+  //     lat: -88.28,
+  //     lng: 139.41,
+  //     areaName: '苍风高地'
+  //   },
+  //   {
+  //     lat: -100.96,
+  //     lng: 127.12,
+  //     areaName: '碧水原'
+  //   }
+  // ]
+  mapManager.setMapAnchorList(store.mapAnchorList)
+  mapManager.renderAreaNames()
 
   const pointerList = [
     {
