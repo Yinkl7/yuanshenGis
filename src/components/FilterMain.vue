@@ -1,9 +1,13 @@
 <script setup lang="ts">
 import { getMapFilterTree } from '@/js/api'
+import { useHomeStore } from '@/stores/home'
+import { storeToRefs } from 'pinia'
 import { nextTick, onMounted, ref } from 'vue'
 
+const store = useHomeStore()
+const { filterTree } = storeToRefs(store)
+
 const activeTypeIndex = ref(0)
-const filterTree = ref<any[]>([])
 const filterMainRight = ref<HTMLElement | null>(null)
 
 onMounted(() => {
@@ -12,15 +16,14 @@ onMounted(() => {
 
 async function init() {
   let res = await getMapFilterTree()
-  console.log('res', res)
-  filterTree.value = res.data
+  store.setFilterTree(res.data)
   nextTick(() => {
     addScrollEvent()
   })
 }
 
 function onFilterItemClick(child: any) {
-  Reflect.set(child, 'active', !child.active)
+  store.handleSelectTreeList(child)
 }
 
 function getActiveCount(item: any) {

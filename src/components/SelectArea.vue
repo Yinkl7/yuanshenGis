@@ -1,23 +1,45 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { useHomeStore } from '@/stores/home'
+import { storeToRefs } from 'pinia'
+import { ref } from 'vue'
+
+const store = useHomeStore()
+const { selectTreeList } = storeToRefs(store)
+
+const expended = ref(true)
+function expendClick() {
+  expended.value = !expended.value
+}
+
+function removeItem(data: any) {
+  store.handleSelectTreeList(data)
+  if(selectTreeList.value.length == 0) {
+    expended.value = true
+  }
+}
+</script>
 
 <template>
-  <div class="select-area">
-    <!-- <div class="selected-count">2</div>
-    <div class="selected-icon"></div> -->
-    <div class="list-container">
-      <div class="up-container">
+  <div class="select-area" v-show="selectTreeList.length">
+    <template v-if="expended">
+      <div class="selected-count">{{ selectTreeList.length }}</div>
+      <div class="selected-icon" @click="expendClick"></div>
+    </template>
+
+    <div class="list-container" v-else>
+      <div class="up-container" @click="expendClick">
         <div class="up-icon"></div>
       </div>
-      <div class="selected-item" v-for="item in 5" :key="item">
-        <div class="item-container">
+      <div class="selected-item" v-for="item in selectTreeList" :key="item.id">
+        <div class="item-container" @click="removeItem(item)">
           <div
             class="item-icon"
             :style="{
-              backgroundImage: `url(https://uploadstatic.mihoyo.com/ys-obc/2020/09/08/75276545/c59585d1fabc9c22ad3fcf94e1622aa8_357413506633071859.png)`
+              backgroundImage: `url(${item.icon})`
             }"
           ></div>
         </div>
-        <div class="icon-delete"></div>
+        <div class="icon-delete" @click="removeItem(item)"></div>
       </div>
     </div>
   </div>
@@ -59,6 +81,7 @@
 
   .list-container {
     .up-container {
+      cursor: pointer;
       margin-bottom: 8px;
       display: flex;
       justify-content: center;
