@@ -10,7 +10,7 @@ interface AreaNameConifg {
 interface pointConifg {
   lat: number
   lng: number
-  iconId: number
+  icon: string
 }
 
 export class MapManager {
@@ -83,14 +83,15 @@ export class MapManager {
   }
 
   renderPoints(pointerList: pointConifg[]) {
+    this.pointLayerGroup?.clearLayers()
+
     const pointerMarks = pointerList.map((item) => {
-      const { lat, lng, iconId } = item
-      const iconUrl = `images/map-icon/${iconId}.png`
+      const { lat, lng, icon } = item
       return L.marker(L.latLng(lat, lng), {
         icon: L.divIcon({
           className: 'map-point-item',
           html: `<div class='point-item-container'>
-            <div class='point-pic' style="background-image: url(${iconUrl})"></div>
+            <div class='point-pic' style="background-image: url(${icon})"></div>
           </div>`
         })
       })

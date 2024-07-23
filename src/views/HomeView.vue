@@ -8,6 +8,7 @@ import SelectArea from '@/components/SelectArea.vue'
 import FilterMain from '@/components/FilterMain.vue'
 import { useHomeStore } from '@/stores/home'
 import { getMapAnchorList } from '@/js/api'
+import { globalDataInstance } from '@/js/global-data'
 
 const store = useHomeStore()
 
@@ -22,39 +23,25 @@ async function initMapAnchorList() {
 
 async function init() {
   await initMapAnchorList()
-  const mapManager = new MapManager('map')
+  globalDataInstance.mapManager = new MapManager('map')
+  globalDataInstance.mapManager.setMapAnchorList(store.mapAnchorList)
+  globalDataInstance.mapManager.enableDebugger()
+  globalDataInstance.mapManager.renderAreaNames()
 
-  // const markerList = [
+  // const pointerList = [
   //   {
-  //     lat: -88.28,
-  //     lng: 139.41,
-  //     areaName: '苍风高地'
+  //     lat: -90.56,
+  //     lng: 144.65,
+  //     iconId: 1
   //   },
   //   {
-  //     lat: -100.96,
-  //     lng: 127.12,
-  //     areaName: '碧水原'
+  //     lat: -99.53,
+  //     lng: 131.65,
+  //     iconId: 1
   //   }
   // ]
-  mapManager.setMapAnchorList(store.mapAnchorList)
-  mapManager.renderAreaNames()
 
-  const pointerList = [
-    {
-      lat: -90.56,
-      lng: 144.65,
-      iconId: 1
-    },
-    {
-      lat: -99.53,
-      lng: 131.65,
-      iconId: 1
-    }
-  ]
-
-  mapManager.renderPoints(pointerList)
-
-  mapManager.enableDebugger()
+  // globalDataInstance.mapManager.renderPoints(pointerList)
 }
 </script>
 

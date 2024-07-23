@@ -1,5 +1,6 @@
 import { ref } from 'vue'
 import { defineStore } from 'pinia'
+import { globalDataInstance } from '@/js/global-data'
 
 export const useHomeStore = defineStore('home', () => {
   const filterTree = ref<any[]>([])
@@ -19,6 +20,22 @@ export const useHomeStore = defineStore('home', () => {
       selectTreeList.value = selectTreeList.value.filter((item: any) => item.id !== data.id)
     }
     Reflect.set(data, 'active', !data.active)
+
+    if (globalDataInstance.mapManager) {
+      renderPointList()
+    }
+  }
+
+  function renderPointList() {
+    let pointList: any[] = []
+    selectTreeList.value.forEach((element: any) => {
+      const points: any = element.children.map((val: any) => {
+        return { ...val, icon: element.icon }
+      })
+      pointList = pointList.concat(points)
+    })
+
+    globalDataInstance.mapManager.renderPoints(pointList)
   }
 
   function setMapAnchorList(data: any) {
