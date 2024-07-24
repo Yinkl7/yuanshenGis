@@ -35,6 +35,15 @@ export class MapManager {
 
     this.prevZoom = this.map.getZoom()
 
+    this.map.addControl(
+      // @ts-ignore
+      new L.Control.Zoomslider({
+        position: 'bottomright',
+        stepHeight: 30,
+        knobHeight: 20
+      })
+    )
+
     L.tileLayer('images/map/{z}/{x}/{y}.png', {
       bounds,
       maxZoom: 7

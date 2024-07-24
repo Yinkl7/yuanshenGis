@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import 'leaflet/dist/leaflet.css'
+import 'leaflet.zoomslider'
 import { onMounted } from 'vue'
 import { MapManager } from '@/js/map-manage'
 import FilterHeader from '@/components/FilterHeader.vue'
