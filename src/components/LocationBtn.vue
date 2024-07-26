@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { getMapAnchorList } from '@/js/api'
+import { globalDataInstance } from '@/js/global-data'
 import { useHomeStore } from '@/stores/home'
 import { storeToRefs } from 'pinia'
 import { onMounted } from 'vue'
@@ -20,6 +21,10 @@ async function initMapAnchorList() {
   let res = await getMapAnchorList()
   store.setMapAnchorList(res.data)
 }
+
+function onAreaNameClick(item: any, zoom: number) {
+  globalDataInstance.mapManager.flyTo(item, zoom)
+}
 </script>
 
 <template>
@@ -30,11 +35,11 @@ async function initMapAnchorList() {
         <div class="location-title">快速定位</div>
         <div class="content-areas">
           <div class="area-item" v-for="item in mapAnchorList" :key="item.id">
-            <div class="area-parent">
+            <div class="area-parent" @click="onAreaNameClick(item, 5)">
               <div class="parent-icon"></div>
               <div class="parent-name">{{ item.name }}</div>
             </div>
-            <div class="area-child" v-for="child in item.children" :key="child.id">{{ child.name }}</div>
+            <div class="area-child" v-for="child in item.children" :key="child.id" @click="onAreaNameClick(child, 6)">{{ child.name }}</div>
           </div>
         </div>
       </div>

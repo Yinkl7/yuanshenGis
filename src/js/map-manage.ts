@@ -1,4 +1,5 @@
 import L from 'leaflet'
+import { getMapPointDetail } from './api'
 
 interface AreaNameConifg {
   lat: number
@@ -11,6 +12,8 @@ interface pointConifg {
   lat: number
   lng: number
   icon: string
+  pointId: number
+  name: string
 }
 
 export class MapManager {
@@ -19,6 +22,7 @@ export class MapManager {
   private pointLayerGroup: L.LayerGroup | undefined
   private mapAnchorList: AreaNameConifg[] = []
   private prevZoom = 0
+  private lastActivePointId = -1
 
   constructor(domId: string) {
     const bounds = L.latLngBounds(L.latLng(0, 0), L.latLng(-256, 256))
@@ -57,6 +61,17 @@ export class MapManager {
       }
       this.prevZoom = this.map.getZoom()
     })
+
+    this.map.on('click', this.onMapClick.bind(this))
+  }
+
+  // 点击地图取消激活
+  onMapClick() {
+    if (this.lastActivePointId !== -1) {
+      const lastPoint = document.getElementById(`mapPointItem${this.lastActivePointId}`)
+      lastPoint?.classList.remove('active')
+      this.lastActivePointId = -1
+    }
   }
 
   setMapAnchorList(configList: AreaNameConifg[]) {
@@ -95,19 +110,74 @@ export class MapManager {
     this.pointLayerGroup?.clearLayers()
 
     const pointerMarks = pointerList.map((item) => {
-      const { lat, lng, icon } = item
-      return L.marker(L.latLng(lat, lng), {
+      const { lat, lng, icon, pointId, name } = item
+      const marker = L.marker(L.latLng(lat, lng), {
         icon: L.divIcon({
           className: 'map-point-item',
-          html: `<div class='point-item-container'>
+          html: `<div class='point-item-container' id='mapPointItem${pointId}'>
             <div class='point-pic' style="background-image: url(${icon})"></div>
-          </div>`
+            <div class='arrow-icon lt'></div>
+            <div class='arrow-icon lb'></div>
+            <div class='arrow-icon rt'></div>
+            <div class='arrow-icon rb'></div>
+          </div>`,
+          iconSize: [37, 40],
+          iconAnchor: [19, 20]
         })
       })
+
+      marker.bindPopup(
+        L.popup({
+          content: this.calcPopupContent({ info: {}, correct_user_list: [], last_update_time: '', name: '' })
+        })
+      )
+
+      // 弹窗打开时请求数据
+      marker.on('popupopen', async () => {
+        const res = await getMapPointDetail(pointId)
+        marker.setPopupContent(this.calcPopupContent({ ...res.data, name }))
+      })
+
+      marker.on('click', () => {
+        if (this.lastActivePointId == pointId) return
+
+        if (this.lastActivePointId !== -1) {
+          const lastPoint = document.getElementById(`mapPointItem${this.lastActivePointId}`)
+          lastPoint?.classList.remove('active')
+        }
+        const currentPoint = document.getElementById(`mapPointItem${pointId}`)
+        currentPoint?.classList.add('active')
+        this.lastActivePointId = pointId
+      })
+
+      return marker
     })
 
     this.pointLayerGroup = L.layerGroup(pointerMarks)
     this.pointLayerGroup.addTo(this.map)
+  }
+
+  calcPopupContent(popupData: any) {
+    const { correct_user_list, info, last_update_time, name } = popupData
+    const avatarElmStr = correct_user_list.map((val: any) => {
+      return `<div class="avatar-item" style="background-image: url(${val.img})"></div>`
+    })
+    return `<div class="point-popup-container">
+        <div class="popup-title">${name}</div>
+        <div class="popup-pic" style="background-image: url(${info.img})"></div>
+        <div class="point-name">bbbb</div>
+        <div class="contributor-container">
+          <div class="contributor-label">贡献者：</div>
+          <div class="avatar-container">
+            ${avatarElmStr}
+          </div>
+        </div>
+        <div class="point-time">更新时间：${last_update_time}</div>
+      </div>`
+  }
+
+  flyTo(latlng: L.LatLngExpression, zoom?: number) {
+    this.map.flyTo(latlng, zoom)
   }
 
   enableDebugger() {
